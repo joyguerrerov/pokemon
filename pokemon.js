@@ -1,61 +1,81 @@
-const url = 'https://pokeapi.co/api/v2/pokemon/1';
-const url1 = 'https://pokeapi.co/api/v2/pokemon/2';
-const url2 = 'https://pokeapi.co/api/v2/pokemon/3';
+const url = 'https://pokeapi.co/api/v2/pokemon?limit=151';
 
 async function cargarDatos(endPoint) {
     const response = await fetch(endPoint, { method: 'GET' })
-    //console.log(response);
+    
+    //esto me da un array que esta en data
     const data = await response.json()
-    //console.log(data);
-    const array = data.results
-    pintarContainers(array, sectionContainers)
-}
 
-/*
-<div class="container">
-    <h1>Pokedex</h1>
-    <ol id="pokedex"></ol>
- </div>
-<article>
-    <figure>
-        <img src="" alt=""> solo esta tiene atributo 
-    </figure>
-    <h3>Nombre personaje</h3>
-</article>
-*/
+    // guardo la lista de pokemons con su URL para consultar su datos
+    let pokemos = data.results;
 
-const sectionContainers = document.querySelector('.containers');
-// const pokemon = results.map(('result') => ({
-//     name: result.name,
-//     image: result.sprites['front_default'],
-//     type: result.types.map((type) => type.type.name).join(', '),
-//     id: result.id
-// }))
-function pintarContainers( lista, lugar){
-    for (let container of lista) {
-        const div = document.createElement('div');
-        const h1 = document.createElement('h1');
-        h1.textContent = 'Pokedex'
-        const ol = document.createElement('ol');
-        ol.id = "pokedex"
+    // creo una variable para guardar los pokemos
+    let todosPokemon = []
 
-        const article = document.createElement('article');
-        const figure = document.createElement('figure');
-        const img = document.createElement('img');
-        img.src = data.sprites['front_default']; 
-        img.alt = data.name;
-        const h3 = document.createElement('h3');
-            h3.textContent = data.name
-        
-        div.append(h1, ol);
-        ol.appendChild(`${id}`);
-        figure.appendChild(img);
-        article.append(figure, h3);
+    // recorreo cada pokemon para consultar su API en concreto
+    for (let p of pokemos)
+    {
+        // connsulto su api
+        let res = await fetch(p.url, { method: 'GET' })
+        // guardo la respuesta en la variable
+        let infoPokemon = await res.json();
 
-         lugar.appendChild(div,article);
+        // añado a la lista de pokemos todos los datos de ese pokemon
+        todosPokemon.push(infoPokemon);
     }
+
+    // console.log(todosPokemon);
+
+    // dibujo en web
+    pintarCharacters(todosPokemon, sectionCharacters)
+    // if (data.results) {
+    //     const array = data.results
+    //     pintarCharacters(array, sectionCharacters)
+    // } else {
+    //     pintarUnCharacter(data, sectionCharacters)
+    // }
+  
 }
 
 cargarDatos(url)
-cargarDatos(url1)
-cargarDatos(url2)
+
+/*
+<article>
+    <figure>
+        <img src="" alt="">  
+    </figure>
+    <h3>Nombre personaje</h3>
+    <h4>Tipo:</h4>
+    <p>#</p>
+
+</article>
+*/
+
+const sectionCharacters = document.querySelector('.characters');
+function pintarCharacters(lista, lugar) {
+    for (let character of lista) {
+        pintarUnCharacter(character, lugar)
+    }
+}
+
+function pintarUnCharacter(character, lugar) {
+        const article = document.createElement('article');
+        const figure = document.createElement('figure');
+        const img = document.createElement('img');
+        // console.log("linea 1");    
+        // console.log(character.sprites.front_default);
+        img.src = `${character.sprites.other['official-artwork'].front_default}`;
+        img.alt = character.name;
+        const h3 = document.createElement('h3');
+        h3.textContent = character.name
+        // const h4 = document.createElement('h4');
+        // h4.textContent = character.
+        // const p = document.createElement('p');
+        // p.textContent = character.
+        
+        figure.appendChild(img);
+        article.append(figure, h3);
+
+         lugar.appendChild(article);
+}
+
